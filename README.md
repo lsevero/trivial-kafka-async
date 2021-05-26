@@ -1,14 +1,25 @@
 # trivial-kafka-async
 
-A Clojure library designed to ... well, that part is up to you.
+A simple kafka client using core.async
 
 ## Usage
 
-FIXME
+Just instantiate `producer!`s and `consumer!`s when you need.
+Both those functions return a `core.async/chan`.
+
+To send send a message to topic, send a message to the producer channel returned by `producer!`.
+
+To receive a message from a topic, read the messages on the consumer channel returned by `consumer!`.
+
+There is also a `worker!` facility that consumes a consumer channel and apply a function to each message received.
+
+## Working example
+
+See [kafka-client-template](https://github.com/lsevero/kafka-client-template)
 
 ## License
 
-Copyright © 2021 FIXME
+Copyright © 2021 Lucas Severo
 
 This program and the accompanying materials are made available under the
 terms of the Eclipse Public License 2.0 which is available at
