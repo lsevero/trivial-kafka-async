@@ -13,6 +13,13 @@ To receive a message from a topic, read the messages on the consumer channel ret
 
 There is also a `worker!` facility that consumes a consumer channel and apply a function to each message received.
 
+## Troubleshooting 
+### Unresponsive kafka channels
+core.async default pool-size may be too small if you have to many producers and consumers instantiated.
+To increase the pool size you'll need to pass this java property to your app, or in java or in `:jvm-opts` project.clj lein section:
+`-Dclojure.core.async.pool-size=<number of threads>`
+The default for this property is 8.
+
 ## Working example
 
 See [kafka-client-template](https://github.com/lsevero/kafka-client-template)
