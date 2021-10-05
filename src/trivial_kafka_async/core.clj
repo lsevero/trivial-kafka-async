@@ -71,12 +71,38 @@
 (defn worker!
   "Execute a function f each time a message is received at the channel.
   Checks if a exception is passed in a channel, if it is f will not be applied and the exception will be logged.
+  An optional list of extra arguments can be passed to `worker!` and will be passed to `f` as the second argument.
   "
-  [channel f]
-  (log/debug (str "Started worker with chan: " channel " fn:" f))
-  (go-loop []
-           (let [msg (<! channel)]
-             (if (instance? Throwable msg)
-               (log/error msg "Received a Exception through the channel. Fn will not be applied.")
-               (f msg)) 
-             (recur))))
+  ([channel f extra]
+   (log/debug (str "Started worker with chan: " channel " fn:" f " extra: " extra))
+   (go-loop []
+            (let [msg (<! channel)]
+              (if (instance? Throwable msg)
+                (log/error msg "Received a Exception through the channel. Fn will not be applied.")
+                (if extra
+                  (f msg extra)
+                  (f msg))) 
+              (recur))))
+  ([channel f]
+   (worker! channel f nil)))
+
+(defn worker-batch!
+  "Execute a function `f` for every `n` messages received at the channel.
+  Checks if a exception is passed in a channel, if it is f will not be applied and the exception will be logged.
+  An optional extra argument can be passed to `worker-batch!` and will be passed to `f` as the second argument.
+  "
+  ([channel n f extra]
+   (log/debug (str "Started batch worker with chan: " channel " fn:" f " extra: " extra))
+   (go-loop [msgs []]
+            (if (= n (count msgs))
+              (do
+                (if extra
+                  (f msgs extra)
+                  (f msgs))
+                (recur []))
+             (let [msg (<! channel)]
+              (if (instance? Throwable msg)
+                (log/error msg "Received a Exception through the channel. Skipping it.")
+                (recur (conj msgs msg)))))))
+  ([channel n f]
+   (worker-batch! channel n f nil)))
