@@ -13,7 +13,7 @@
     ))
 
 (defn producer!
-  "Receives a map of a topic and the japa properties.
+  "Receives a map of a topic and the java properties.
   Returns a channel that will be consumed and sent each individual message to kafka in a different thread.
   "
   [{:keys [topic properties flush?] :or {flush? true}}]
@@ -45,7 +45,7 @@
       chan-producer)))
 
 (defn consumer!
-  "Receives a map of a topic and the japa properties.
+  "Receives a map of a topic and the java properties.
   Returns a channel that will be populated as a message is received in the kafka poll in a different thread.
   "
   [{:keys [topic properties duration] :or {duration 100}}]
