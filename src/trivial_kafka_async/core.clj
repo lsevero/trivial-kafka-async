@@ -100,9 +100,9 @@
                   (f msgs extra)
                   (f msgs))
                 (recur []))
-             (let [msg (<! channel)]
-              (if (instance? Throwable msg)
-                (log/error msg "Received a Exception through the channel. Skipping it.")
-                (recur (conj msgs msg)))))))
+              (let [msg (<! channel)]
+                (if (instance? Throwable msg)
+                  (log/error msg "Received a Exception through the channel. Skipping it.")
+                  (recur (conj msgs msg)))))))
   ([channel n f]
    (worker-batch! channel n f nil)))
