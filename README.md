@@ -2,6 +2,8 @@
 
 A simple kafka client using core.async
 
+[![Clojars Project](https://img.shields.io/clojars/v/org.clojars.lsevero/trivial-kafka-async.svg)](https://clojars.org/org.clojars.lsevero/trivial-kafka-async)
+
 ## Usage
 
 Just instantiate `producer!`s and `consumer!`s when you need.
