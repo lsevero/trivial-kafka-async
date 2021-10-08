@@ -46,8 +46,7 @@
 
 (defn consumer!
   "Receives a map of a topic and the java properties.
-  Returns a channel that will be populated as a message is received in the kafka poll in a different thread.
-  "
+  Returns a channel, which will be populated with individual messages from the kafka topic."
   [{:keys [topic properties duration] :or {duration 100}}]
   (let [consumer (KafkaConsumer. ^Properties (doto (Properties.)
                                                (.putAll properties)))
@@ -65,6 +64,28 @@
                    (log/debug (format "Consumed record with key %s and value %s\n" key- value)))
                  (catch Exception e
                    (log/error e (str "Error in kafka consumer topic:" topic)))))
+             (recur (seq (.poll consumer (Duration/ofMillis duration)))))
+    chan-consumer))
+
+(defn consumer-batch!
+  "Receives a map of a topic and the java properties.
+  Returns a channel, which will be populated with a list of messages from the kafka topic.
+  Each list of messages corresponds to a iteration of the consumer poll.
+  "
+  [{:keys [topic properties duration] :or {duration 100}}]
+  (let [consumer (KafkaConsumer. ^Properties (doto (Properties.)
+                                               (.putAll properties)))
+        chan-consumer (chan)]
+
+    (.subscribe consumer [topic])
+    (go-loop [records []]
+             (log/trace (str "records:" records))
+             (>! chan-consumer (mapv #(let [value (.value ^ConsumerRecord %)
+                                           key- (.key ^ConsumerRecord %)]
+                                       (log/debug (format "Consumed record with key %s and value %s\n" key- value))
+                                       {:key key-
+                                        :value value})
+                                     records))
              (recur (seq (.poll consumer (Duration/ofMillis duration)))))
     chan-consumer))
 
